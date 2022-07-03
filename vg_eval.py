@@ -51,7 +51,7 @@ def tuples_from_sg(sg, triplets_size=[1,2,3]):
         obj_tuples.append((obj.names[0],))
         for attr in obj.attributes:
             attr_tuples.append((attr,obj.names[0]))
-    return [x for list(set(obj_tuples))+list(set(attr_tuples))+rel_triplets if len(x) in triplets_size]
+    return [x for x in list(set(obj_tuples))+list(set(attr_tuples))+rel_triplets if len(x) in triplets_size]
 
 def get_sc_graph(id):
     return vg.get_scene_graph(id, images=VG_DATA,
