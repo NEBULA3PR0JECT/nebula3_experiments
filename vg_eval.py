@@ -1,7 +1,7 @@
 import sys
 from PIL import Image
 import requests
-import visual_genome.local as vg
+import nebula_vg_driver.visual_genome.local as vg
 import json
 import copy
 import subprocess
@@ -140,3 +140,26 @@ class VGEvaluation:
             src_i = [x for x in src_triplets if len(x)==i]
             total_recall.extend(self.recall_triplets(src_i,dst_i,method=methods[i-1]))
         return total_recall
+
+# objetc based avoiding loading             vg.get_all_image_data(images_path) per image
+class Sg_handler():
+    def __init__(self, images_path, image_data_dir='data/by-id/',
+                    synset_file='data/synsets.json') -> None:
+        self.image_data_dir = image_data_dir
+        self.synset_file = synset_file
+        if type(images_path) is str:
+            # Instead of a string, we can pass this dict as the argument `images`
+            self.images = {img.id: img for img in vg.get_all_image_data(images_path)}
+
+        pass
+    def get_scene_graph(self, image_id):
+    # Load a single scene graph from a .json file.
+
+        fname = str(image_id) + '.json'
+        image = self.images[image_id]
+        data = json.load(open(self.image_data_dir + fname, 'r'))
+
+        scene_graph = vg.parse_graph_local(data, image)
+        scene_graph = vg.init_synsets(scene_graph, self.synset_file)
+        return scene_graph
+
